@@ -22,11 +22,7 @@ import java.util.UUID;
 @Service
 public class ImageServiceImpl implements ImageService {
 
-    @Value("${AZURE_STORAGE_BLOB_CONNECTION_STRING}")
-    private String connectionString;
 
-    @Value("${AZURE_STORAGE_BLOB_CONTAINER_NAME}")
-    private String containerName;
 
     private final ImageRepository imageRepository;
 
@@ -37,15 +33,7 @@ public class ImageServiceImpl implements ImageService {
         this.imageRepository = imageRepository;
     }
 
-    // Inicializa el BlobContainerClient después de que las propiedades hayan sido inyectadas
-    private void initContainerClient() {
-        if (containerClient == null) {
-            containerClient = new BlobContainerClientBuilder()
-                    .connectionString(connectionString)
-                    .containerName(containerName)
-                    .buildClient();
-        }
-    }
+
 
     @Override
     public List<Image> getAllImages() {
@@ -64,50 +52,9 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public String saveImage(MultipartFile file, Long productId) {
-        try {
-            // Inicializar el cliente de contenedor
-            initContainerClient();
-
-            // Crear contenedor si no existe
-            containerClient.createIfNotExists();
-
-            // Obtener la extensión del archivo (por ejemplo, .jpg, .png, etc.)
-            String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-
-            // Validar la extensión del archivo (asegurándonos de que sea una imagen)
-            assert extension != null;
-            if (!isValidImageExtension(extension)) {
-                return "El tipo de archivo no es válido. Solo se permiten imágenes.";
-            }
-
-            // Generar un nombre único para el archivo, manteniendo la extensión original
-            String generatedFileName = UUID.randomUUID().toString() + "." + extension;
-
-            BlobClient blobClient = containerClient.getBlobClient(generatedFileName);
-
-            // Subir el archivo
-            blobClient.upload(file.getInputStream(), file.getSize(), true); // true para sobrescribir si existe
-
-            // Asociar la imagen a un producto
-            Image image = new Image();
-            image.setUrl(generatedFileName);  // Guardamos solo el nombre del archivo generado
-            Product product = new Product();
-            product.setId(productId);
-            image.setProduct(product);
-
-            // Guardar el nombre de la imagen con su extension  en la base de datos
-            imageRepository.save(image);
-
-            return "Imagen guardada con éxito";
-
-        } catch (IOException e) {
-            return "Error al guardar la imagen: " + e.getMessage();
-        }
+       return "";
     }
 
-    // Método para validar las extensiones de archivo de imagen
-    private boolean isValidImageExtension(String extension) {
-        List<String> validExtensions = List.of("jpg", "jpeg", "png", "gif", "bmp", "tiff");
-        return validExtensions.contains(extension.toLowerCase());
-    }
 }
+
+

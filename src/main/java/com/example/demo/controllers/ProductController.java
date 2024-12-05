@@ -1,9 +1,11 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dtos.ProductRequest;
+import com.example.demo.dtos.product.ProductResponseDTO;
 import com.example.demo.models.Product;
-import com.example.demo.projections.ProductoProjection;
 import com.example.demo.services.interfaces.ProductService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +25,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<Product> getAllProducts() {
+    public List<ProductResponseDTO> getAllProducts() {
         return productService.getAllProducts();
     }
 
@@ -34,10 +36,21 @@ public class ProductController {
                 .orElseGet(() -> ResponseEntity.notFound().build());  // Retorna 404 si no se encuentra el producto
     }
 
-    @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        Product createdProduct = productService.saveProduct(product);
-        return ResponseEntity.status(201).body(createdProduct);  // Retorna un 201 Created
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<String> createProduct(@ModelAttribute ProductRequest productRequest) {
+
+        try {
+            this.productService.saveProduct(productRequest);
+
+            return new ResponseEntity<>("Product created", HttpStatus.CREATED);
+
+        } catch (Exception e) {
+
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+
+
     }
 
     @PutMapping("/{id}")

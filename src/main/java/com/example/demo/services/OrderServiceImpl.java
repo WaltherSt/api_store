@@ -1,7 +1,5 @@
 package com.example.demo.services;
 
-import com.example.demo.dtos.OrderDTO;
-import com.example.demo.mappers.OrderMapper;
 import com.example.demo.models.Order;
 import com.example.demo.models.OrderDetail;
 import com.example.demo.models.Product;
@@ -22,13 +20,13 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
-    private final OrderMapper orderMapper;
+
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, OrderMapper orderMapper,
+    public OrderServiceImpl(OrderRepository orderRepository,
                             ProductRepository productRepository) {
         this.orderRepository = orderRepository;
-        this.orderMapper = orderMapper;
+
         this.productRepository = productRepository;
 
     }

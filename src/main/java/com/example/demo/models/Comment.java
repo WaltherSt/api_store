@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "comments")
 public class Comment {
@@ -14,7 +16,7 @@ public class Comment {
 
     private String comment;
 
-    private String date;
+    private LocalDateTime date;
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
@@ -25,6 +27,13 @@ public class Comment {
     @JoinColumn(name = "product_id", nullable = false)
     @JsonBackReference
     private Product product;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.date == null) {
+            this.date = LocalDateTime.now();
+        }
+    }
 
     // Getters y Setters
 
@@ -44,11 +53,11 @@ public class Comment {
         this.comment = comment;
     }
 
-    public String getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

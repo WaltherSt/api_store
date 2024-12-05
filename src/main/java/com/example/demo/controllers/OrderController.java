@@ -1,10 +1,10 @@
 package com.example.demo.controllers;
 
 
-import com.example.demo.mappers.OrderMapper;
 import com.example.demo.models.Order;
 import com.example.demo.services.interfaces.OrderService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,10 +37,12 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
-        Order createdOrder = orderService.saveOrder(order);
-        return ResponseEntity.status(201).body(createdOrder);  // Retorna un 201 Created
-    }
+    public Void createOrder(@RequestBody Order order) {
+
+        System.out.println(order);
+
+        return null;
+    };
 
     @PutMapping("/{id}")
     public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order order) {

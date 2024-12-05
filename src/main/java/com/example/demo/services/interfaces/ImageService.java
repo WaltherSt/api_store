@@ -9,7 +9,10 @@ import java.util.Optional;
 public interface ImageService {
 
     List<Image> getAllImages();
+
     Optional<Image> getImageById(Long id);
+
     void deleteImage(Long id);
+
     String saveImage(MultipartFile file, Long productId);
 }

@@ -1,87 +1,115 @@
 package com.example.demo.services;
-import com.azure.storage.blob.BlobContainerClient;
-import com.azure.storage.blob.BlobContainerClientBuilder;
-import com.azure.storage.blob.sas.BlobSasPermission;
-import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
-import com.azure.storage.common.sas.SasProtocol;
+
+import com.example.demo.dtos.ProductRequest;
+import com.example.demo.dtos.product.ProductCommentDTO;
+import com.example.demo.dtos.product.ProductResponseDTO;
+import com.example.demo.mappers.product.ProductMappers;
+import com.example.demo.models.Category;
+import com.example.demo.models.Image;
 import com.example.demo.models.Product;
-import com.example.demo.projections.ProductoProjection;
-import com.example.demo.repositories.CategoryRepository;
-import com.example.demo.repositories.ImageRepository;
 import com.example.demo.repositories.ProductRepository;
+import com.example.demo.services.interfaces.CategoryService;
 import com.example.demo.services.interfaces.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static com.example.demo.mappers.product.ProductMappers.productToProductResponseDTO;
 
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    // Parámetros para la conexión al contenedor de Azure Blob Storage
-    @Value("${AZURE_STORAGE_BLOB_CONNECTION_STRING}")
-    private String connectionString;
 
-    @Value("${AZURE_STORAGE_BLOB_CONTAINER_NAME}")
-    private String containerName;
-
-    @Value("${AZURE_STORAGE_ACCOUNT_NAME}")
-    private String accountName;
 
     private final ProductRepository productRepository;
+    private final CloudinaryService cloudinaryService;
+    private final CategoryService categoryService;
 
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository,ImageRepository imageRepository, CategoryRepository categoryRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryService categoryService,
+                              CloudinaryService cloudinaryService) {
         this.productRepository = productRepository;
+        this.cloudinaryService = cloudinaryService;
+        this.categoryService = categoryService;
     }
     @Override
-    public List<Product> getAllProducts() {
+    public List<ProductResponseDTO> getAllProducts() {
         List<Product> products = this.productRepository.findAll();
+        List<ProductResponseDTO> productResponseDTOs = new ArrayList<>();
 
-        // Conectar al contenedor de Azure Blob Storage
-        BlobContainerClient containerClient = new BlobContainerClientBuilder()
-                .connectionString(connectionString)
-                .containerName(containerName)
-                .buildClient();
-
-        // Generar los valores SAS para el contenedor
-        BlobServiceSasSignatureValues sasValues = new BlobServiceSasSignatureValues(
-                OffsetDateTime.now().plusHours(1), // Tiempo de expiración
-                BlobSasPermission.parse("r") // Permiso de lectura
-        ).setProtocol(SasProtocol.HTTPS_ONLY);
-
-        // Generar el SAS
-        String sasUrl = containerClient.generateSas(sasValues);
-
-        // URL base para acceder al contenedor
-        String baseUrl = String.format("https://%s.blob.core.windows.net/%s/", accountName, containerName);
-
-        // Asignar el SAS a las imágenes de los productos
-        products.forEach(product -> {
-            product.getImages().forEach(image -> {
-                // Construir la URL completa para cada imagen con SAS
-                String imageUrl = baseUrl + image.getUrl() + "?" + sasUrl;
-                image.setUrl(imageUrl);
+            products.forEach(product-> {
+                ProductResponseDTO productResponseDTO = productToProductResponseDTO(product);
+                productResponseDTOs.add(productResponseDTO);
             });
-        });
-
-        return products;
+            return productResponseDTOs;
     }
 
 
     @Override
     public Optional<Product> getProductById(Long id) {
+
         return this.productRepository.findById(id);
     }
 
+    /**
+     * Guarda un nuevo producto en la base de datos.
+     * Este método crea una nueva instancia de un producto, asigna su categoría,
+     * establece sus atributos (nombre, descripción, precio, stock) y asocia imágenes
+     * que se suben a Cloudinary. Finalmente, guarda el producto en la base de datos junto
+     * con las imágenes asociadas.
+     *
+     * @param productRequest Contiene los datos del producto a guardar, incluyendo el ID de la categoría
+     *                       y las imágenes asociadas.
+     * @return El producto guardado, incluyendo sus imágenes asociadas.
+     * @throws RuntimeException Si no se encuentra la categoría o si ocurre un error durante la subida de imágenes.
+     */
     @Override
-    public Product saveProduct(Product product) {
-        return this.productRepository.save(product);
+    public Product saveProduct(ProductRequest productRequest) {
+        Product product = new Product();
+
+        // Obtiene la categoría asociada al producto utilizando el ID proporcionado
+        Optional<Category> category = categoryService.getCategoryById(productRequest.getCategory());
+        if (category.isPresent()) {
+            product.setCategory(category.get());
+        } else {
+            throw new RuntimeException("Category not found");
+        }
+
+        // Asigna los atributos del producto
+        product.setName(productRequest.getName());
+        product.setDescription(productRequest.getDescription());
+        product.setPrice(new BigDecimal(productRequest.getPrice()));
+        product.setStock(productRequest.getStock());
+
+        // Itera sobre las imágenes proporcionadas y sube cada imagen
+        productRequest.getImages().forEach(image -> {
+            try {
+                // Subir la imagen a Cloudinary
+                String url = this.cloudinaryService.upload(image);
+
+                // Crea la instancia de Image y asocia la URL de la imagen y el producto
+                Image i = new Image();
+                i.setUrl(url);
+                i.setProduct(product); // Asocia la imagen al producto
+
+                // Agrega la imagen a la lista de imágenes del producto
+                product.getImages().add(i);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e); // Si ocurre un error, se lanza una excepción
+            }
+        });
+
+        // Guarda el producto en la base de datos junto con las imágenes asociadas
+        return this.productRepository.save(
+                product);  // Aquí se guardan tanto el producto como las imágenes por el cascade
     }
 
 

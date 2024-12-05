@@ -1,7 +1,8 @@
 package com.example.demo.services.interfaces;
 
+import com.example.demo.dtos.ProductRequest;
+import com.example.demo.dtos.product.ProductResponseDTO;
 import com.example.demo.models.Product;
-import com.example.demo.projections.ProductoProjection;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,11 +10,11 @@ import java.util.Optional;
 public interface ProductService {
 
 
-    List<Product> getAllProducts();
+    List<ProductResponseDTO> getAllProducts();
 
     Optional<Product> getProductById(Long id);
 
-    Product saveProduct(Product product);
+    Product saveProduct(ProductRequest productRequest);
 
     Optional<Product> updateProduct(Long id, Product product);
 

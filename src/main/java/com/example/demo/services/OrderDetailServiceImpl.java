@@ -1,7 +1,6 @@
 package com.example.demo.services;
 
 import com.example.demo.dtos.OrderDetailDTO;
-import com.example.demo.mappers.OrderMapper;
 import com.example.demo.models.OrderDetail;
 import com.example.demo.models.Product;
 import com.example.demo.repositories.OrderDetailRepository;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,23 +17,20 @@ import java.util.stream.Collectors;
 @Service
 public class OrderDetailServiceImpl  implements OrderDetailService {
     private final OrderDetailRepository orderDetailRepository;
-    private final OrderMapper orderMapper;
+
     private final ProductRepository productRepository;
 
     @Autowired
-    public OrderDetailServiceImpl(OrderDetailRepository orderDetailRepository, OrderMapper orderMapper,ProductRepository productRepository) {
+    public OrderDetailServiceImpl(OrderDetailRepository orderDetailRepository, ProductRepository productRepository) {
         this.orderDetailRepository = orderDetailRepository;
-        this.orderMapper= orderMapper;
+
         this.productRepository = productRepository;
     }
 
+
     @Override
     public List<OrderDetailDTO> getAllOrderDetails() {
-
-        List<OrderDetail> orderDetails = orderDetailRepository.findAll();
-        return orderDetails.stream()
-                .map(orderMapper::toOrderDetailDTO)
-                .collect(Collectors.toList());
+        return List.of();
     }
 
     @Override

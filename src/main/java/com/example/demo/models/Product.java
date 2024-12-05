@@ -25,7 +25,7 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference  // Gestiona la relación de 'images' en el lado de Product
-    private List<Image> images;
+    private List<Image> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
@@ -34,23 +34,16 @@ public class Product {
     public Product() {
     }
 
-    public Product(Category category, String description, Long id, List<Image> images, String name, BigDecimal price,
-                   Integer stock) {
-        this.category = category;
-        this.description = description;
+    public Product(Long id, String name, BigDecimal price, String description, Integer stock, Category category,
+                   List<Image> images, List<Comment> comments) {
         this.id = id;
-        this.images = images;
         this.name = name;
         this.price = price;
+        this.description = description;
         this.stock = stock;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
         this.category = category;
+        this.images = images;
+        this.comments = comments;
     }
 
     public String getDescription() {
@@ -67,14 +60,6 @@ public class Product {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public List<Image> getImages() {
-        return images;
-    }
-
-    public void setImages(List<Image> images) {
-        this.images = images;
     }
 
     public String getName() {
@@ -101,24 +86,27 @@ public class Product {
         this.stock = stock;
     }
 
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public List<Image> getImages() {
+        return images;
+    }
+
+    public void setImages(List<Image> images) {
+        this.images = images;
+    }
+
     public List<Comment> getComments() {
         return comments;
     }
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
-    }
-
-    @Override
-    public String toString() {
-        return "Product{" +
-                "category=" + category.getId() +
-                ", id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", price=" + price +
-                ", stock=" + stock +
-                ", images=" + images.size() +
-                '}';
     }
 }

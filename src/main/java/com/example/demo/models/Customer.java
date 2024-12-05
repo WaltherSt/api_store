@@ -21,6 +21,8 @@ public class Customer {
     private String address;
     private String password;
     private String phone;
+    private String city;
+    private String image;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference(value = "customer-order") // Referencia única para la relación con Order
@@ -33,15 +35,34 @@ public class Customer {
     public Customer() {
     }
 
-    public Customer(String address, String email, String name, Long id, List<Order> orders, String password,
-                    String phone) {
+    public Customer(Long id, List<Comment> comments, List<Order> orders, String image, String city, String phone,
+                    String password, String address, String email, String name) {
+        this.id = id;
+        this.comments = comments;
+        this.orders = orders;
+        this.image = image;
+        this.city = city;
+        this.phone = phone;
+        this.password = password;
         this.address = address;
         this.email = email;
         this.name = name;
-        this.id = id;
-        this.orders = orders;
-        this.password = password;
-        this.phone = phone;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getAddress() {
@@ -111,13 +132,16 @@ public class Customer {
     @Override
     public String toString() {
         return "Customer{" +
-                "address='" + address + '\'' +
-                ", id=" + id +
+                "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
+                ", address='" + address + '\'' +
                 ", password='" + password + '\'' +
                 ", phone='" + phone + '\'' +
-                ", orders=" + orders.size() +
+                ", city='" + city + '\'' +
+                ", image='" + image + '\'' +
+                ", orders=" + orders +
+                ", comments=" + comments +
                 '}';
     }
 }
