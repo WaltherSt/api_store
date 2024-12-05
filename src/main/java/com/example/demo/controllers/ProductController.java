@@ -30,10 +30,8 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        Optional<Product> product = productService.getProductById(id);
-        return product.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());  // Retorna 404 si no se encuentra el producto
+    public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable Long id) {
+    return this.productService.getProductById(id);
     }
 
     @PostMapping(consumes = "multipart/form-data")
@@ -41,16 +39,11 @@ public class ProductController {
 
         try {
             this.productService.saveProduct(productRequest);
-
             return new ResponseEntity<>("Product created", HttpStatus.CREATED);
 
         } catch (Exception e) {
-
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
-
-
     }
 
     @PutMapping("/{id}")

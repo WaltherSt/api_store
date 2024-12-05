@@ -1,10 +1,12 @@
 package com.example.demo.controllers;
 
 
+import com.example.demo.dtos.customer.CustomerRequest;
 import com.example.demo.models.Customer;
 import com.example.demo.services.interfaces.CustomerService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,10 +32,16 @@ public class CustomerController {
                 .orElseGet(() -> ResponseEntity.notFound().build());  // Retorna 404 si no se encuentra el cliente
     }
 
-    @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
-        Customer createdCustomer = customerService.saveCustomer(customer);
-        return ResponseEntity.status(201).body(createdCustomer);  // Retorna un 201 Created
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<String> createCustomer(@ModelAttribute CustomerRequest customerRequest) {
+
+        try{
+            this.customerService.saveCustomer(customerRequest);
+            return new ResponseEntity<String>("customer created", HttpStatus.CREATED);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping("/{id}")

@@ -1,7 +1,6 @@
 package com.example.demo.services;
 
 import com.example.demo.dtos.ProductRequest;
-import com.example.demo.dtos.product.ProductCommentDTO;
 import com.example.demo.dtos.product.ProductResponseDTO;
 import com.example.demo.mappers.product.ProductMappers;
 import com.example.demo.models.Category;
@@ -9,8 +8,10 @@ import com.example.demo.models.Image;
 import com.example.demo.models.Product;
 import com.example.demo.repositories.ProductRepository;
 import com.example.demo.services.interfaces.CategoryService;
+import com.example.demo.services.interfaces.ImageService;
 import com.example.demo.services.interfaces.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -19,17 +20,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.demo.mappers.product.ProductMappers.productToProductResponseDTO;
+
 
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
-
-
     private final ProductRepository productRepository;
     private final CloudinaryService cloudinaryService;
     private final CategoryService categoryService;
+
+    private final ProductMappers productMappers= new ProductMappers();
 
 
     @Autowired
@@ -43,19 +44,18 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponseDTO> getAllProducts() {
         List<Product> products = this.productRepository.findAll();
         List<ProductResponseDTO> productResponseDTOs = new ArrayList<>();
-
             products.forEach(product-> {
-                ProductResponseDTO productResponseDTO = productToProductResponseDTO(product);
+                ProductResponseDTO productResponseDTO = productMappers.productToProductResponseDTO(product);
                 productResponseDTOs.add(productResponseDTO);
             });
             return productResponseDTOs;
     }
 
-
     @Override
-    public Optional<Product> getProductById(Long id) {
-
-        return this.productRepository.findById(id);
+    public ResponseEntity<ProductResponseDTO> getProductById(Long id) {
+        Optional<Product> product = this.productRepository.findById(id);
+        return product.map(value -> ResponseEntity.ok(productMappers.productToProductResponseDtoWithComments(value))).orElseGet(
+                () -> ResponseEntity.notFound().build());
     }
 
     /**
