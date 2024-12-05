@@ -1,4 +1,5 @@
 package com.example.demo.models;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -23,12 +24,13 @@ public class Product {
     @JoinColumn(name="category_id")
     private Category category;
 
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference  // Gestiona la relación de 'images' en el lado de Product
+    @JsonManagedReference (value = "product-images") // Gestiona la relación de 'images' en el lado de Product
     private List<Image> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference
+    @JsonManagedReference(value="product-comments")
     private List<Comment> comments = new ArrayList<>();
 
     public Product() {

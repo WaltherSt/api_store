@@ -39,7 +39,7 @@ public class OrderController {
     @PostMapping
     public Void createOrder(@RequestBody Order order) {
 
-        System.out.println(order);
+       orderService.saveOrder(order);
 
         return null;
     };

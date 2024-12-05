@@ -1,6 +1,8 @@
 package com.example.demo.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 
@@ -21,8 +23,9 @@ public class OrderDetail {
     @JsonBackReference(value="order-detail")
     private Order order;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name="product_id")
+    @JsonIgnore
     private Product product;
 
     public OrderDetail() {
@@ -76,14 +79,4 @@ public class OrderDetail {
         this.quantity = quantity;
     }
 
-    @Override
-    public String toString() {
-        return "OrderDetail{" +
-                "id=" + id +
-                ", quantity=" + quantity +
-                ", price=" + price +
-                ", order=" + order +
-                ", product=" + product.getId() +
-                '}';
-    }
 }

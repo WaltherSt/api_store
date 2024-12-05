@@ -20,12 +20,11 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
-    @JsonManagedReference
     private Customer customer;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference(value = "product-comments")
     private Product product;
 
     @PrePersist
@@ -33,6 +32,17 @@ public class Comment {
         if (this.date == null) {
             this.date = LocalDateTime.now();
         }
+    }
+
+    public Comment() {
+    }
+
+    public Comment(long id, String comment, LocalDateTime date, Customer customer, Product product) {
+        this.id = id;
+        this.comment = comment;
+        this.date = date;
+        this.customer = customer;
+        this.product = product;
     }
 
     // Getters y Setters

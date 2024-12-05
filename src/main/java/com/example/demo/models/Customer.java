@@ -1,6 +1,7 @@
 package com.example.demo.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -29,7 +30,7 @@ public class Customer {
     private List<Order> orders;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference
+    @JsonIgnore
     private List<Comment> comments = new ArrayList<>();
 
     public Customer() {

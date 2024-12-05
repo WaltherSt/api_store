@@ -17,7 +17,7 @@ public class Image {
 
     @ManyToOne
     @JoinColumn(name="product_id")
-    @JsonBackReference  // Este es el "respaldo" de la relación en Image
+    @JsonBackReference (value="product-images") // Este es el "respaldo" de la relación en Image
     private Product product;
 
 

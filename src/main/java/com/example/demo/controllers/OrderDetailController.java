@@ -22,8 +22,8 @@ public class OrderDetailController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderDetailDTO>> getAllOrderDetails() {
-        List<OrderDetailDTO> orderDetails = orderDetailService.getAllOrderDetails();
+    public ResponseEntity<List<OrderDetail>> getAllOrderDetails() {
+        List<OrderDetail> orderDetails = orderDetailService.getAllOrderDetails();
         return ResponseEntity.ok(orderDetails);
     }
 

@@ -29,8 +29,8 @@ public class OrderDetailServiceImpl  implements OrderDetailService {
 
 
     @Override
-    public List<OrderDetailDTO> getAllOrderDetails() {
-        return List.of();
+    public List<OrderDetail> getAllOrderDetails() {
+        return this.orderDetailRepository.findAll();
     }
 
     @Override

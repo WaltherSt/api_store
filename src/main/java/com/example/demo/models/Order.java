@@ -29,7 +29,7 @@ public class Order {
     private Customer customer;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference(value = "order-detail") // Referencia única para la relación con OrderDetail
+    @JsonManagedReference(value="order-detail")  // Referencia única para la relación con OrderDetail
     private List<OrderDetail> orderDetails;
 
     @PrePersist
