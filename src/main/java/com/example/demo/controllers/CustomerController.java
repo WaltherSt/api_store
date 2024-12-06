@@ -10,7 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -33,14 +35,19 @@ public class CustomerController {
     }
 
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<String> createCustomer(@ModelAttribute CustomerRequest customerRequest) {
+    public ResponseEntity<Map<String,String>> createCustomer(@ModelAttribute CustomerRequest customerRequest) {
+
+        Map<String,String> res = new HashMap<>();
+        Map<String,String> err = new HashMap<>();
 
         try{
             this.customerService.saveCustomer(customerRequest);
-            return new ResponseEntity<String>("customer created", HttpStatus.CREATED);
+            res.put("Message", "Customer created");
+            return  ResponseEntity.status(HttpStatus.CREATED).body(res);
         }
         catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            err.put("Message", e.getMessage());
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
         }
     }
 

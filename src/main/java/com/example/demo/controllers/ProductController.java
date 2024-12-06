@@ -9,8 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/products")
@@ -35,14 +34,19 @@ public class ProductController {
     }
 
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<String> createProduct(@ModelAttribute ProductRequest productRequest) {
+    public ResponseEntity<Map<String,String>> createProduct(@ModelAttribute ProductRequest productRequest) {
+
+        Map<String, String> res = new HashMap<>();
+        Map<String, String> errors = new HashMap<>();
 
         try {
             this.productService.saveProduct(productRequest);
-            return new ResponseEntity<>("Product created", HttpStatus.CREATED);
+            res.put("message", "Product created");
+            return ResponseEntity.status(HttpStatus.CREATED).body(res);
 
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            errors.put("message", e.getMessage());
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
     }
 
